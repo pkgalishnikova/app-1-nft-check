@@ -30,18 +30,18 @@ export default function CharityNFTGrid({
                             href={`/charity/token_charity/${CHARITY_NFT_COLLECTION_ADDRESS}/${nft.metadata.id}`}
                             key={nft.metadata.id}
                         >
-                            <NFT nft={nft} contractAddress={""} onClick={function (): void {
-                                throw new Error("Function not implemented.");
-                            } } />
+                            <NFT nft={nft} contractAddress={CHARITY_NFT_COLLECTION_ADDRESS} />
                         </Link>
                     ) : (
                         <div
                             key={nft.metadata.id}
                             onClick={() => overrideOnclickBehavior(nft)}
                         >
-                            <NFT nft={nft} contractAddress={""} onClick={function (): void {
-                                    throw new Error("Function not implemented.");
-                                } } />
+                            <NFT
+                                nft={nft}
+                                contractAddress={CHARITY_NFT_COLLECTION_ADDRESS}
+                                onClick={() => overrideOnclickBehavior(nft)}
+                            />
                         </div>
                     )
                 )
