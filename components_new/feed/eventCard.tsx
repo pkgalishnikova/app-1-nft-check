@@ -13,7 +13,7 @@ export default function EventCard(props: EventCardProps) {
   const date = new Date(props.timeStamp.toNumber() * 1000);
 
   return (
-      <div className={styles.card} style={{ backgroundColor: "#ededed", color: "white", maxWidth: '1400px' }}>
+      <div className={styles.card} style={{ backgroundColor: "#ededed", color: "white", maxWidth: '1400px', marginRight: "2rem"}}>
           <div className={styles.cardText} style={{ color: "black" }}>
               {/* Use inline styles for flexbox layout */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

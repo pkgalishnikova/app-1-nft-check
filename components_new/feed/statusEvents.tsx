@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 export default function StatusEvents() {
     const [isLoading, setIsLoading] = useState(true);
     const [visibleEvents, setVisibleEvents] = useState(3); // Start with 6 events visible
-    
+
     const {
         contract
     } = useContract(STATUS_CONTRACT_ADDRESS);
@@ -18,7 +18,7 @@ export default function StatusEvents() {
         data: statusEvents,
         isLoading: isStatusEventsLoading,
     } = useContractEvents(
-        contract, 
+        contract,
         "StatusUpdated",
         {
             subscribe: true,
@@ -36,8 +36,8 @@ export default function StatusEvents() {
 
         return () => clearTimeout(timer);
     }, []);
-    
-    if(isLoading) {
+
+    if (isLoading) {
         return (
             <div className={styles.sectionLoading}>
                 {/* <Lottie
@@ -52,24 +52,21 @@ export default function StatusEvents() {
         <div style={{ marginLeft: '2rem', paddingBottom: '30px' }}>
             {!isStatusEventsLoading && statusEvents && (
                 <>
-                    {/* Display only visible events */}
                     {statusEvents.slice(0, visibleEvents).map((event, index) => (
                         <div key={index} style={{ marginBottom: '1rem' }}>
-                            <EventCard 
+                            <EventCard
                                 walletAddress={event.data.user}
                                 newstatus={event.data.newstatus}
                                 timeStamp={event.data.timestamp}
                             />
                         </div>
                     ))}
-
-                    {/* Load More button - only shows if there are more events to load */}
                     {statusEvents.length > visibleEvents && (
-                        <div style={{ 
-                            display: 'flex', 
-                            justifyContent: 'center', 
-                            margin: '2rem 0',
-                            marginBottom: '3rem'
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            marginTop: '2rem',
+                            marginBottom: '0.1rem'
                         }}>
                             <button
                                 onClick={loadMoreEvents}
@@ -83,7 +80,7 @@ export default function StatusEvents() {
                                     fontWeight: '400',
                                     cursor: 'pointer',
                                     transition: 'background-color 0.2s ease',
-                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
                                 }}
                                 onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#BDBDBD'}
                                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ededed'}

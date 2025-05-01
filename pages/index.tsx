@@ -1,49 +1,9 @@
-// import { ConnectWallet } from "@thirdweb-dev/react";
-// import styles from "../styles/Home.module.css";
-// import Image from "next/image";
-// import { NextPage } from "next";
-// import NextLink from 'next/link';
-// import { Container, Flex, Stack, Heading, Button, Text } from "@chakra-ui/react";
-// import React, { useState, useEffect } from "react";
-
-
-
-// const Home: NextPage = () => {
-//   return (
-//     <Container maxW={"1200px"}>
-//       <Flex h={"80vh"} alignItems={"center"} justifyContent={"center"}>
-//       <Stack align={"center"} spacing={4}>
-//         <Image
-//                               src="/images/card.png"
-//                               width={200}
-//                               height={200} 
-//                               alt={""}          />
-//       <Heading>Marketplace</Heading>
-//       <Stack direction={"row"} spacing={"8"}>
-//       <Button
-//             as={NextLink} href='/gym/gym_index'
-//           >Gym</Button>
-//       <Button
-//             as={NextLink} href='/food_delivery/food_delivery_index'
-//           >Food delivery</Button>
-//       <Button
-//             as={NextLink} href='/charity/charity_index'
-//           >Charity</Button>
-//       </Stack>
-//       </Stack>
-//       </Flex>
-//     </Container>
-//   );
-// };
-
-// export default Home;
-
 // import { ConnectWallet, useAddress, useContract } from "@thirdweb-dev/react";
 // import styles from "../styles/Home.module.css";
 // import Image from "next/image";
 // import { NextPage } from "next";
 // import NextLink from 'next/link';
-// import { Container, Flex, Stack, Heading, Button, Text, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
+// import { Box, Container, Flex, SimpleGrid, Stack, Heading, Button, Text, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
 // import React, { useState, useEffect } from "react";
 // import { motion } from 'framer-motion';
 // import { keyframes } from '@emotion/react';
@@ -117,24 +77,161 @@
 //   }, [address, contract]);
 
 //   return (
-    
-//     <Container maxW={"1200px"}>
-//       <Flex h={"80vh"} alignItems={"center"} justifyContent={"center"}>
-//         <Stack align={"center"} spacing={4}>
-//           <Image
-//             src="/images/card.png"
-//             width={200}
-//             height={200}
-//             alt={""}
-//           />
-//           <Heading>Marketplace</Heading>
-//           <Stack direction={"row"} spacing={"8"}>
-//             <Button as={NextLink} href='/gym/gym_index'>Gym</Button>
-//             <Button as={NextLink} href='/food_delivery/food_delivery_index'>Food delivery</Button>
-//             <Button as={NextLink} href='/charity/charity_index'>Charity</Button>
+
+//     <Box>
+//       <Flex 
+//         minH="100vh" 
+//         alignItems="center" 
+//         justifyContent="center"
+//         bgGradient="linear(to-br, #0F4C75, #3282B8, #BBE1FA)"
+//         css={{
+//           backgroundSize: "400% 400%",
+//           animation: `${gradient} 15s ease infinite`
+//         }}
+//         position="relative"
+//         overflow="hidden"
+//       >
+
+//         <Container maxW="container.xl" position="relative" zIndex={2}>
+//           <Stack spacing={8} align="center" textAlign="center">
+//             <motion.div
+//               initial={{ opacity: 0, y: 20 }}
+//               animate={{ opacity: 1, y: 0 }}
+//               transition={{ duration: 0.8 }}
+//             >
+//               <Heading 
+//                 fontSize={{ base: '5xl', md: '7xl' }} 
+//                 color="white"
+//                 textShadow="0 4px 30px rgba(0,0,0,0.15)"
+//               >
+//                 Revolutionize Subscriptions with NFTs
+//                 <Text as="span" display="block" fontSize="2xl" mt={4}>
+//                 Own, Trade, and Manage Your Subscriptions Like Never Before
+//                 </Text>
+//               </Heading>
+//             </motion.div>
+
+//             <SimpleGrid 
+//               columns={{ base: 1, md: 3 }} 
+//               spacing={8} 
+//               mt={16}
+//               w="full"
+//             >
+//               {[
+//                 { 
+//                   title: 'Well-being', 
+//                   image: '/images/dumbbell.png',
+//                   link: '/gym/gym_index'
+//                 },
+//                 { 
+//                   title: 'Food Delivery', 
+//                   image: '/images/delivery.png',
+//                   link: '/food_delivery/food_delivery_index'
+//                 },
+//                 { 
+//                   title: 'Charity', 
+//                   image: '/images/charity.png',
+//                   link: '/charity/charity_index'
+//                 }
+//               ].map((item, i) => (
+//                 <motion.div
+//                   key={i}
+//                   whileHover={{ y: -10 }}
+//                 >
+//                   <Button
+//                     as={NextLink}
+//                     href={item.link}
+//                     variant="unstyled"
+//                     w="full"
+//                     h="full"
+//                   >
+//                     <Box
+//                       bg="whiteAlpha.200"
+//                       backdropFilter="blur(10px)"
+//                       borderRadius="2xl"
+//                       p={6}
+//                       border="1px solid"
+//                       borderColor="whiteAlpha.300"
+//                       w="full"
+//                       h="full"
+//                     >
+//                       <Box
+//                         h="200px"
+//                         w="full"
+//                         borderRadius="xl"
+//                         mb={4}
+//                         overflow="hidden"
+//                         display="flex"
+//                         alignItems="center"
+//                         justifyContent="center"
+//                       >
+//                         <Image
+//                                     src={item.image}
+//                                     alt=""
+//                                     width={180}
+//                                     height={180}
+//                                     objectFit="contain" />
+//                       </Box>
+//                       <Text fontSize="xl" color="white" fontWeight="bold">
+//                         {item.title}
+//                       </Text>
+//                     </Box>
+//                   </Button>
+//                 </motion.div>
+//               ))}
+//             </SimpleGrid>
 //           </Stack>
-//         </Stack>
+//         </Container>
 //       </Flex>
+
+//       <Box py={24} bg="gray.50">
+//         <Container maxW="container.lg">
+//           <Heading textAlign="center" mb={16}>
+//             Why Choose Our Platform?
+//           </Heading>
+
+//           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
+//             {[
+//               { 
+//                 title: 'For Users', 
+//                 desc: 'Full control over subscriptions - buy, sell or trade anytime. Manage all your subscriptions in one place with our intuitive mobile app.'
+//               },
+//               { 
+//                 title: 'For Businesses', 
+//                 desc: 'Reduce operational costs with blockchain automation. Access new revenue streams from secondary market transactions and reach wider audiences.'
+//               },
+//               { 
+//                 title: 'For Everyone', 
+//                 desc: 'First truly flexible subscription ecosystem powered by NFTs. No more rigid commitments - your subscriptions become liquid digital assets.'
+//               }
+//             ].map((feature, i) => (
+//               <Box
+//                 key={i}
+//                 p={8}
+//                 bg="white"
+//                 borderRadius="2xl"
+//                 boxShadow="xl"
+//                 textAlign="center"
+//                 transition="all 0.3s"
+//                 _hover={{
+//                   transform: 'translateY(-5px)',
+//                   boxShadow: '2xl'
+//                 }}
+//                 minH="300px"
+//                 display="flex"
+//                 flexDirection="column"
+//                 justifyContent="center"
+//               >
+//                 <Heading fontSize="xl" mb={4} color="#3282B8">
+//                   {feature.title}
+//                 </Heading>
+//                 <Text color="gray.600">{feature.desc}</Text>
+//               </Box>
+//             ))}
+//           </SimpleGrid>
+//         </Container>
+//       </Box>
+
 
 //       {/* Payment Notification Modal */}
 //       <Modal isOpen={isOpen} onClose={onClose}>
@@ -163,18 +260,24 @@
 //           </ModalFooter>
 //         </ModalContent>
 //       </Modal>
-//     </Container>
+//     </Box>
 //   );
 // };
 
 // export default Home;
+
+// pages/index.tsx
 
 import { ConnectWallet, useAddress, useContract } from "@thirdweb-dev/react";
 import styles from "../styles/Home.module.css";
 import Image from "next/image";
 import { NextPage } from "next";
 import NextLink from 'next/link';
-import { Box, Container, Flex, SimpleGrid, Stack, Heading, Button, Text, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
+import {
+  Box, Container, Flex, SimpleGrid, Stack, Heading, Button, Text,
+  useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody,
+  ModalFooter, ModalCloseButton, useDisclosure
+} from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import { motion } from 'framer-motion';
 import { keyframes } from '@emotion/react';
@@ -191,68 +294,39 @@ const Home: NextPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
 
-  // Replace with your actual contract address
   const { contract } = useContract("0xB23b3F8029a808b56a7b25EF16E50D37A35Da6DB");
 
-  // Check for pending payments when user connects wallet
   useEffect(() => {
-    const checkPendingPayments = async () => {
-      if (!address || !contract) return;
+    if (!address) return;
 
+    const interval = setInterval(async () => {
       try {
-        // Get all contracts associated with the user
-        const contracts = await contract.call("getAllContracts");
+        const res = await fetch("/api/webhook");
+        const { payments } = await res.json();
 
-        for (const contractId of contracts) {
-          const totalSupply = await contract.call("getTotalSupply", [contractId]);
+        const userPayment = payments.find((p: any) => p.user === address.toLowerCase());
 
-          for (let i = 0; i < totalSupply; i++) {
-            const { tokenId, owner } = await contract.call("getTokenIdByOwner", [i, contractId]);
-
-            // Only check for the current connected wallet
-            if (owner.toLowerCase() === address.toLowerCase()) {
-              const url = await contract.call("returnURI", [tokenId, contractId]);
-              const res = await fetch(url);
-              const obj = await res.json();
-
-              const now = Math.floor(Date.now() / 1000);
-              const status = Number(obj.status);
-
-              if (status <= now) {
-                setPaymentDetails({
-                  tokenId,
-                  contractId,
-                  amount: obj.pay,
-                  status: obj.status,
-                  donations: obj.donations
-                });
-                onOpen();
-                break; // Stop after first found payment
-              }
-            }
-          }
+        if (userPayment) {
+          setPaymentDetails({
+            tokenId: userPayment.tokenId,
+            contractId: userPayment.contractId,
+            amount: Number(userPayment.donations) / 1e18,
+          });
+          onOpen();
         }
-      } catch (error) {
-        console.error("Error checking payments:", error);
-        toast({
-          title: "Error",
-          description: "Failed to check subscription status",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
+      } catch (err) {
+        console.error("Polling error:", err);
       }
-    };
+    }, 5000);
 
-    checkPendingPayments();
-  }, [address, contract]);
+    return () => clearInterval(interval);
+  }, [address]);
 
   return (
-    
     <Box>
-      <Flex 
-        minH="100vh" 
-        alignItems="center" 
+      <Flex
+        minH="100vh"
+        alignItems="center"
         justifyContent="center"
         bgGradient="linear(to-br, #0F4C75, #3282B8, #BBE1FA)"
         css={{
@@ -262,7 +336,6 @@ const Home: NextPage = () => {
         position="relative"
         overflow="hidden"
       >
-
         <Container maxW="container.xl" position="relative" zIndex={2}>
           <Stack spacing={8} align="center" textAlign="center">
             <motion.div
@@ -270,52 +343,38 @@ const Home: NextPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <Heading 
-                fontSize={{ base: '5xl', md: '7xl' }} 
+              <Heading
+                fontSize={{ base: '5xl', md: '7xl' }}
                 color="white"
                 textShadow="0 4px 30px rgba(0,0,0,0.15)"
               >
                 Revolutionize Subscriptions with NFTs
                 <Text as="span" display="block" fontSize="2xl" mt={4}>
-                Own, Trade, and Manage Your Subscriptions Like Never Before
+                  Own, Trade, and Manage Your Subscriptions Like Never Before
                 </Text>
               </Heading>
             </motion.div>
 
-            <SimpleGrid 
-              columns={{ base: 1, md: 3 }} 
-              spacing={8} 
-              mt={16}
-              w="full"
-            >
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} mt={16} w="full">
               {[
-                { 
-                  title: 'Well-being', 
+                {
+                  title: 'Well-being',
                   image: '/images/dumbbell.png',
                   link: '/gym/gym_index'
                 },
-                { 
-                  title: 'Food Delivery', 
+                {
+                  title: 'Food Delivery',
                   image: '/images/delivery.png',
                   link: '/food_delivery/food_delivery_index'
                 },
-                { 
-                  title: 'Charity', 
+                {
+                  title: 'Charity',
                   image: '/images/charity.png',
                   link: '/charity/charity_index'
                 }
               ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  whileHover={{ y: -10 }}
-                >
-                  <Button
-                    as={NextLink}
-                    href={item.link}
-                    variant="unstyled"
-                    w="full"
-                    h="full"
-                  >
+                <motion.div key={i} whileHover={{ y: -10 }}>
+                  <Button as={NextLink} href={item.link} variant="unstyled" w="full" h="full">
                     <Box
                       bg="whiteAlpha.200"
                       backdropFilter="blur(10px)"
@@ -336,12 +395,7 @@ const Home: NextPage = () => {
                         alignItems="center"
                         justifyContent="center"
                       >
-                        <Image
-                                    src={item.image}
-                                    alt=""
-                                    width={180}
-                                    height={180}
-                                    objectFit="contain" />
+                        <Image src={item.image} alt="" width={180} height={180} objectFit="contain" />
                       </Box>
                       <Text fontSize="xl" color="white" fontWeight="bold">
                         {item.title}
@@ -360,19 +414,19 @@ const Home: NextPage = () => {
           <Heading textAlign="center" mb={16}>
             Why Choose Our Platform?
           </Heading>
-          
+
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
             {[
-              { 
-                title: 'For Users', 
+              {
+                title: 'For Users',
                 desc: 'Full control over subscriptions - buy, sell or trade anytime. Manage all your subscriptions in one place with our intuitive mobile app.'
               },
-              { 
-                title: 'For Businesses', 
+              {
+                title: 'For Businesses',
                 desc: 'Reduce operational costs with blockchain automation. Access new revenue streams from secondary market transactions and reach wider audiences.'
               },
-              { 
-                title: 'For Everyone', 
+              {
+                title: 'For Everyone',
                 desc: 'First truly flexible subscription ecosystem powered by NFTs. No more rigid commitments - your subscriptions become liquid digital assets.'
               }
             ].map((feature, i) => (
@@ -403,30 +457,23 @@ const Home: NextPage = () => {
         </Container>
       </Box>
 
-
       {/* Payment Notification Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Subscription Payment Due</ModalHeader>
+          <ModalHeader>Subscription Payment Received</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>Your subscription payment is due. Please visit your Charity NFTs to complete the payment.</Text>
-            <Text mt={4}>Amount Due: {paymentDetails?.amount} ETH</Text>
+            <Text>We detected a new subscription payment!</Text>
+            <Text mt={4}>Amount: {paymentDetails?.amount} ETH</Text>
             <Text>Token ID: {paymentDetails?.tokenId}</Text>
           </ModalBody>
           <ModalFooter>
-            <Button
-              as={NextLink}
-              href="/charity/charity_index"
-              colorScheme="blue"
-              mr={3}
-              onClick={onClose}
-            >
+            <Button as={NextLink} href="/charity/charity_index" colorScheme="blue" mr={3} onClick={onClose}>
               View My Charity NFTs
             </Button>
             <Button variant="ghost" onClick={onClose}>
-              Remind Me Later
+              Close
             </Button>
           </ModalFooter>
         </ModalContent>
