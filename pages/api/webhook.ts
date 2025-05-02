@@ -1,39 +1,72 @@
-// pages/api/webhook.ts
-
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-// TEMPORARY in-memory store for recent payments (resets on server restart)
-let latestPayments: any[] = []
+// In-memory store for notifications
+const notifications: any[] = [];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // POST - Add new notification (from Defender)
   if (req.method === "POST") {
-    const payload = req.body
-    const eventName = payload.event_name
+    const { type, payload } = req.body;
 
-    // Make sure it's the right event from your smart contract
-    if (eventName === "PaymentCompleted") {
-      const { user, tokenId, contractId, donations } = payload.payload
+    if (type === 'payment-due') {
+      const newNotification = {
+        id: `notif-${Date.now()}`,
+        user: payload.client.toLowerCase(),
+        type: 'payment-due',
+        message: `Payment due for token ${payload.token_id}`,
+        data: {
+          amount: payload.pay,
+          tokenId: payload.token_id,
+          contractId: payload.contractId_id
+        },
+        timestamp: Date.now(),
+        read: false
+      };
 
-      latestPayments.push({
-        user: user.toLowerCase(),
-        tokenId,
-        contractId,
-        donations,
-        timestamp: Date.now()
-      })
-
-      // Optional: keep only the last 20 entries
-      latestPayments = latestPayments.slice(-20)
-
-      return res.status(200).json({ received: true })
+      notifications.push(newNotification);
+      return res.status(200).json({ success: true });
     }
 
-    return res.status(200).json({ received: false, reason: "Unknown event" })
+    return res.status(400).json({ error: "Invalid notification type" });
   }
 
+  // GET - Get notifications for user
   if (req.method === "GET") {
-    return res.status(200).json({ payments: latestPayments })
+    const { user } = req.query;
+    
+    if (!user) {
+      return res.status(400).json({ error: "User address required" });
+    }
+
+    const userNotifications = notifications.filter(
+      n => n.user.toLowerCase() === user.toString().toLowerCase()
+    );
+
+    return res.status(200).json({ notifications: userNotifications });
   }
 
-  res.status(405).end() // Method Not Allowed
+  // PUT - Mark notification as read (not implemented in this example)
+  if (req.method === "PUT") {
+    return res.status(200).json({ success: true });
+  }
+
+  // For testing - Add test notification
+  if (req.method === "OPTIONS" && process.env.NODE_ENV === 'development') {
+    notifications.push({
+      id: `test-notif-${Date.now()}`,
+      user: req.query.user?.toString().toLowerCase() || '0x0000000000000000000000000000000000000000',
+      type: 'payment-due',
+      message: 'Test payment due for subscription',
+      data: {
+        amount: '0.1',
+        tokenId: '123',
+        contractId: '456'
+      },
+      timestamp: Date.now(),
+      read: false
+    });
+    return res.status(200).json({ success: true });
+  }
+
+  res.status(405).end();
 }
