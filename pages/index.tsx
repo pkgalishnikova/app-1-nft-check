@@ -287,16 +287,16 @@
 //   const toast = useToast();
 //   const { isOpen, onOpen, onClose } = useDisclosure();
 //   const [paymentDetails, setPaymentDetails] = useState<any>(null);
-  
+
 //   // Check for payment notifications when user connects wallet
 //   useEffect(() => {
 //     const checkForNotifications = async () => {
 //       if (!address) return;
-      
+
 //       try {
 //         const response = await fetch(`/api/webhook?user=${address}`);
 //         const data = await response.json();
-        
+
 //         if (data.notifications && data.notifications.length > 0) {
 //           // Get the most recent notification
 //           const latestNotification = data.notifications[0];
@@ -320,12 +320,12 @@
 //         });
 //       }
 //     };
-    
+
 //     checkForNotifications();
-    
+
 //     // Optional: Set up polling to check for new notifications periodically
 //     const interval = setInterval(checkForNotifications, 30000); // Every 30 seconds
-    
+
 //     return () => clearInterval(interval);
 //   }, [address]);
 
@@ -522,6 +522,7 @@
 import { ConnectWallet, useAddress, useContract } from "@thirdweb-dev/react";
 import { Box, Container, Flex, SimpleGrid, Stack, Heading, Button, Text, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, ModalCloseButton, useDisclosure } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import Image from "next/image";
 import { NextPage } from "next";
 import NextLink from 'next/link';
@@ -541,16 +542,14 @@ const Home: NextPage = () => {
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const { contract } = useContract("0xB23b3F8029a808b56a7b25EF16E50D37A35Da6DB");
 
-  // Check for pending payments when user connects wallet
   useEffect(() => {
     const checkPendingPayments = async () => {
       if (!address) return;
 
       try {
-        // First try to get notifications from webhook API
         const webhookResponse = await fetch(`/api/webhook?user=${address}`);
         const webhookData = await webhookResponse.json();
-        
+
         if (webhookData.notifications && webhookData.notifications.length > 0) {
           const latestNotification = webhookData.notifications[0];
           setPaymentDetails({
@@ -564,7 +563,6 @@ const Home: NextPage = () => {
           return;
         }
 
-        // Fallback to direct contract check if no webhook notifications
         if (contract) {
           const contracts = await contract.call("getAllContracts");
           for (const contractId of contracts) {
@@ -606,16 +604,15 @@ const Home: NextPage = () => {
 
     checkPendingPayments();
 
-    // Set up polling for new notifications every 5 minutes
     const interval = setInterval(checkPendingPayments, 300000);
     return () => clearInterval(interval);
   }, [address, contract]);
 
   return (
     <Box>
-      <Flex 
-        minH="100vh" 
-        alignItems="center" 
+      <Flex
+        minH="100vh"
+        alignItems="center"
         justifyContent="center"
         bgGradient="linear(to-br, #0F4C75, #3282B8, #BBE1FA)"
         css={{
@@ -632,8 +629,8 @@ const Home: NextPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <Heading 
-                fontSize={{ base: '5xl', md: '7xl' }} 
+              <Heading
+                fontSize={{ base: '5xl', md: '7xl' }}
                 color="white"
                 textShadow="0 4px 30px rgba(0,0,0,0.15)"
               >
@@ -644,25 +641,25 @@ const Home: NextPage = () => {
               </Heading>
             </motion.div>
 
-            <SimpleGrid 
-              columns={{ base: 1, md: 3 }} 
-              spacing={8} 
+            <SimpleGrid
+              columns={{ base: 1, md: 3 }}
+              spacing={8}
               mt={16}
               w="full"
             >
               {[
-                { 
-                  title: 'Well-being', 
+                {
+                  title: 'Well-being',
                   image: '/images/dumbbell.png',
                   link: '/gym/gym_index'
                 },
-                { 
-                  title: 'Food Delivery', 
+                {
+                  title: 'Food Delivery',
                   image: '/images/delivery.png',
                   link: '/food_delivery/food_delivery_index'
                 },
-                { 
-                  title: 'Charity', 
+                {
+                  title: 'Charity',
                   image: '/images/charity.png',
                   link: '/charity/charity_index'
                 }
@@ -726,16 +723,16 @@ const Home: NextPage = () => {
 
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
             {[
-              { 
-                title: 'For Users', 
+              {
+                title: 'For Users',
                 desc: 'Full control over subscriptions - buy, sell or trade anytime. Manage all your subscriptions in one place with our intuitive mobile app.'
               },
-              { 
-                title: 'For Businesses', 
+              {
+                title: 'For Businesses',
                 desc: 'Reduce operational costs with blockchain automation. Access new revenue streams from secondary market transactions and reach wider audiences.'
               },
-              { 
-                title: 'For Everyone', 
+              {
+                title: 'For Everyone',
                 desc: 'First truly flexible subscription ecosystem powered by NFTs. No more rigid commitments - your subscriptions become liquid digital assets.'
               }
             ].map((feature, i) => (
@@ -765,28 +762,35 @@ const Home: NextPage = () => {
           </SimpleGrid>
         </Container>
       </Box>
-
-      {/* Payment Notification Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Subscription Payment Due</ModalHeader>
+          <ModalHeader>Charity Donation Reminder</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>Your subscription payment is due. Please visit your Charity NFTs to complete the payment.</Text>
-            <Text mt={4}>Amount Due: {paymentDetails?.amount} ETH</Text>
-            <Text>Token ID: {paymentDetails?.tokenId}</Text>
-            <Text>Contract ID: {paymentDetails?.contractId}</Text>
+            <Text>It's time to make your weekly donation for your Charity NFT:</Text>
+            <Box mt={4} p={4} bg="gray.100" borderRadius="md">
+              {paymentDetails ? (
+                <>
+                  <Text fontWeight="bold">Charity NFT #{paymentDetails.tokenId}</Text>
+                  <Text>Donation Amount: {ethers.utils.formatEther(paymentDetails.amount)} ETH</Text>
+                  <Text>Total Donated: {ethers.utils.formatEther(paymentDetails.donations || "0")} ETH</Text>
+                  <Text>Status: {paymentDetails.status === "0" ? "Paused" : "Active"}</Text>
+                </>
+              ) : (
+                <Text>Loading NFT details...</Text>
+              )}
+            </Box>
           </ModalBody>
           <ModalFooter>
             <Button
               as={NextLink}
-              href="/charity/charity_index"
+              href={`/charity/charity_index`}
               colorScheme="blue"
               mr={3}
               onClick={onClose}
             >
-              View My Charity NFTs
+              Make Donation
             </Button>
             <Button variant="ghost" onClick={onClose}>
               Remind Me Later
@@ -799,3 +803,31 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+      // {/* <Modal isOpen={isOpen} onClose={onClose}>
+      //   <ModalOverlay />
+      //   <ModalContent>
+      //     <ModalHeader>Subscription Payment Due</ModalHeader>
+      //     <ModalCloseButton />
+      //     <ModalBody>
+      //       <Text>Your subscription payment is due. Please visit your Charity NFTs to complete the payment.</Text>
+      //       <Text mt={4}>Amount Due: {paymentDetails?.amount} ETH</Text>
+      //       <Text>Token ID: {paymentDetails?.tokenId}</Text>
+      //       <Text>Contract ID: {paymentDetails?.contractId}</Text>
+      //     </ModalBody>
+      //     <ModalFooter>
+      //       <Button
+      //         as={NextLink}
+      //         href="/charity/charity_index"
+      //         colorScheme="blue"
+      //         mr={3}
+      //         onClick={onClose}
+      //       >
+      //         View My Charity NFTs
+      //       </Button>
+      //       <Button variant="ghost" onClick={onClose}>
+      //         Remind Me Later
+      //       </Button>
+      //     </ModalFooter>
+      //   </ModalContent>
+      // </Modal> */}

@@ -89,6 +89,48 @@ const CharityBuyPage = () => {
     address
   );
 
+  // const mintNFTWithMetadata = async () => {
+  //   if (!signer) {
+  //     alert("Please connect your wallet first.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const contract = new ethers.Contract(
+  //       CHARITY_NFT_COLLECTION_ADDRESS,
+  //       charityNFTAbi,
+  //       signer
+  //     );
+
+  //     const amountInWei = ethers.utils.parseEther(paymentAmount);
+
+  //     const tx = await contract.mint(amountInWei);
+  //     console.log("Transaction sent:", tx.hash);
+  //     await tx.wait();
+  //     console.log("Mint confirmed!");
+
+  //     toast({
+  //       title: "Mint Successful!",
+  //       description: "Your Charity NFT has been minted with weekly donation amount set.",
+  //       status: "success",
+  //       duration: 5000,
+  //       isClosable: true,
+  //     });
+
+  //     setIsMintingModalOpen(false);
+  //     setPaymentAmount("");
+  //   } catch (err) {
+  //     console.error("Mint failed:", err);
+  //     toast({
+  //       title: "Mint Failed",
+  //       description: err instanceof Error ? err.message : "Transaction failed",
+  //       status: "error",
+  //       duration: 5000,
+  //       isClosable: true,
+  //     });
+  //   }
+  // };
+
   const mintNFTWithMetadata = async () => {
     if (!signer) {
       alert("Please connect your wallet first.");
@@ -111,7 +153,7 @@ const CharityBuyPage = () => {
 
       toast({
         title: "Mint Successful!",
-        description: "Your NFT has been minted.",
+        description: "Your Charity NFT has been minted with weekly donation amount set.",
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -123,14 +165,13 @@ const CharityBuyPage = () => {
       console.error("Mint failed:", err);
       toast({
         title: "Mint Failed",
-        description: "Transaction failed.",
+        description: err instanceof Error ? err.message : "Transaction failed",
         status: "error",
         duration: 5000,
         isClosable: true,
       });
     }
   };
-
   return (
     <Box
       minH="100vh"
@@ -175,16 +216,16 @@ const CharityBuyPage = () => {
 
         <Center mb={12}>
           <Box
-                                  bg="whiteAlpha.100"
-                                  backdropFilter="blur(10px)"
-                                  borderRadius="2xl"
-                                  p={8}
-                                  maxW="1000px"
-                                  border="1px solid"
-                                  borderColor="whiteAlpha.300"
-                                  as={motion.div}
-                                  variants={itemVariants}
-                              >
+            bg="whiteAlpha.100"
+            backdropFilter="blur(10px)"
+            borderRadius="2xl"
+            p={8}
+            maxW="1000px"
+            border="1px solid"
+            borderColor="whiteAlpha.300"
+            as={motion.div}
+            variants={itemVariants}
+          >
             <VStack spacing={6} textAlign="center">
               <Heading size="lg" color="white">
                 Want to Launch Your Own Charity NFTs?
@@ -207,45 +248,45 @@ const CharityBuyPage = () => {
               </Button>
             </Flex>
             <Container maxW="1200px" p={5}>
-            <Modal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)}>
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>Mint Charity NFT</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                  <Text mb={4}>Input the daily payment amount:</Text>
-                  <Textarea
-                    placeholder="Enter amount (in ETH)"
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                    mb={4}
-                  />
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    colorScheme="green"
-                    onClick={mintNFTWithMetadata}
-                    isDisabled={!paymentAmount}
-                    width="100%"
-                  >
-                    Confirm Mint
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
+              <Modal isOpen={isMintingModalOpen} onClose={() => setIsMintingModalOpen(false)}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Mint Charity NFT</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Text mb={4}>Input the daily payment amount:</Text>
+                    <Textarea
+                      placeholder="Enter amount (in ETH)"
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      mb={4}
+                    />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button
+                      colorScheme="green"
+                      onClick={mintNFTWithMetadata}
+                      isDisabled={!paymentAmount}
+                      width="100%"
+                    >
+                      Confirm Mint
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
             </Container>
           </Box>
-          </Center>
-          <Box
-                              as={motion.div}
-                              variants={itemVariants}
-                              bg="whiteAlpha.800"
-                              backdropFilter="blur(10px)"
-                              borderRadius="3xl"
-                              p={8}
-                              border="1px solid"
-                              borderColor="whiteAlpha.300"
-                          >
+        </Center>
+        <Box
+          as={motion.div}
+          variants={itemVariants}
+          bg="whiteAlpha.800"
+          backdropFilter="blur(10px)"
+          borderRadius="3xl"
+          p={8}
+          border="1px solid"
+          borderColor="whiteAlpha.300"
+        >
           {/* <Heading size="md" mb={4}>Your Charity NFTs</Heading>
           <Text mb={6}>Manage your charity NFTs.</Text> */}
           <CharityNFTGrid
@@ -253,21 +294,21 @@ const CharityBuyPage = () => {
             isLoading={loadingCharityNfts}
             emptyText={"You do not own any NFTs yet from charity collection"}
           />
+        </Box>
+
+        <Center mt={12}>
+          <Box textAlign="center" maxW="800px">
+            <Heading size="lg" color="white" mb={4}>
+              Ready to Give with Purpose or Lead a Cause?
+            </Heading>
+            <Text fontSize="xl" color="whiteAlpha.800" mb={6}>
+              Subscribe, support, or start your own NFT donation journey today.
+            </Text>
           </Box>
+        </Center>
 
-          <Center mt={12}>
-                              <Box textAlign="center" maxW="800px">
-                                  <Heading size="lg" color="white" mb={4}>
-                                  Ready to Give with Purpose or Lead a Cause?
-                                  </Heading>
-                                  <Text fontSize="xl" color="whiteAlpha.800" mb={6}>
-                                  Subscribe, support, or start your own NFT donation journey today.
-                                  </Text>
-                              </Box>
-                          </Center>
+      </Container>
 
-        </Container>
-      
     </Box>
   );
 };
