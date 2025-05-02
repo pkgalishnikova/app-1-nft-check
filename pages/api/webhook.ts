@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 const notifications: any[] = [];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // POST - Add new notification (from Defender)
+
   if (req.method === "POST") {
     const { type, payload } = req.body;
 
@@ -13,16 +13,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         id: `notif-${Date.now()}`,
         user: payload.client.toLowerCase(),
         type: 'payment-due',
-        message: `Payment due for token ${payload.token_id}`,
+        message: `Payment due for Charity NFT ${payload.token_id}`,
         data: {
           amount: payload.pay,
           tokenId: payload.token_id,
-          contractId: payload.contractId_id
+          contractId: payload.contract_id,
+          status: payload.status,
+          donations: payload.donations,
+          name: `Charity NFT #${payload.token_id}`
         },
         timestamp: Date.now(),
         read: false
       };
-
       notifications.push(newNotification);
       return res.status(200).json({ success: true });
     }
@@ -30,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid notification type" });
   }
 
-  // GET - Get notifications for user
+
   if (req.method === "GET") {
     const { user } = req.query;
     
@@ -45,12 +47,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ notifications: userNotifications });
   }
 
-  // PUT - Mark notification as read (not implemented in this example)
   if (req.method === "PUT") {
     return res.status(200).json({ success: true });
   }
 
-  // For testing - Add test notification
   if (req.method === "OPTIONS" && process.env.NODE_ENV === 'development') {
     notifications.push({
       id: `test-notif-${Date.now()}`,

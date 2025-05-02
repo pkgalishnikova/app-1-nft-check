@@ -842,26 +842,27 @@
 //   };
 // };
 
-import { 
-  Avatar, 
-  Box, 
+import {
+  Avatar,
+  Box,
   Button,
-  Container, 
-  Flex, 
-  SimpleGrid, 
-  Skeleton, 
-  Stack, 
-  Text, 
+  Container,
+  Flex,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Text,
   useToast,
   Badge
 } from "@chakra-ui/react";
-import { 
-  MediaRenderer, 
-  ThirdwebNftMedia, 
-  Web3Button, 
-  useContract, 
-  useValidDirectListings, 
-  useValidEnglishAuctions 
+import {
+  MediaRenderer,
+  ThirdwebNftMedia,
+  Web3Button,
+  useContract,
+  useValidDirectListings,
+  useValidEnglishAuctions,
+  useContractWrite
 } from "@thirdweb-dev/react";
 import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import React, { useState } from "react";
@@ -869,6 +870,8 @@ import { CHARITY_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS, APP_CHARITY_CONTRA
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from 'next/router';
+import { ethers } from "ethers";
+
 
 type Props = {
   nft: NFT;
@@ -881,7 +884,10 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
 
   const { contract: nftCollection } = useContract(CHARITY_NFT_COLLECTION_ADDRESS);
   const { contract: appNFTCharity } = useContract(APP_CHARITY_CONTRACT_ADDRESS);
+  const [isDonating, setIsDonating] = useState(false);
+  const { mutateAsync: makeDonation } = useContractWrite(appNFTCharity, "transferFunds");
   const router = useRouter();
+  const payAmount = ethers.utils.parseEther("0.1");
 
   const { data: directListing, isLoading: loadingDirectListing } =
     useValidDirectListings(marketplace, {
@@ -891,6 +897,57 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
 
   const [bidValue, setBidValue] = useState<string>("");
   const toast = useToast();
+
+  const handleDonate = async () => {
+    if (!nft.metadata?.pay || nft.metadata.pay === "0") {
+      toast({
+        title: "Invalid Donation Amount",
+        description: "This NFT doesn't have a valid donation amount set",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setIsDonating(true);
+    try {
+      const payAmount = ethers.utils.parseEther(String(nft.metadata.pay || "0"));
+
+
+      await makeDonation({
+        args: [
+          ethers.BigNumber.from(nft.metadata.id),
+          1,
+          ethers.BigNumber.from(nft.metadata.status || "0"),
+          ethers.BigNumber.from(nft.metadata.sum || "0"),
+          payAmount
+        ],
+        overrides: {
+          value: payAmount
+        }
+      });
+
+      toast({
+        title: "Donation Successful",
+        description: `Thank you for your donation of ${ethers.utils.formatEther(payAmount)} ETH`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Donation failed:", error);
+      toast({
+        title: "Donation Failed",
+        description: error instanceof Error ? error.message : "Transaction failed",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsDonating(false);
+    }
+  };
 
   const { data: auctionListing, isLoading: loadingAuction } =
     useValidEnglishAuctions(marketplace, {
@@ -909,7 +966,7 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
 
     try {
       const tokenId = nft.metadata.id;
-      const charityId = 1; 
+      const charityId = 1;
       const status = currentStatus;
       const donations = nft.metadata?.sum || "0";
       const pay = nft.metadata?.pay || "0";
@@ -957,36 +1014,41 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
             </Skeleton>
           </Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-  <Box>
-    <Text fontWeight={"bold"}>Description:</Text>
-    <Text>{nft.metadata.description}</Text>
-  </Box>
+            <Box>
+              <Text fontWeight={"bold"}>Description:</Text>
+              <Text>{nft.metadata.description}</Text>
+            </Box>
 
-  <Box>
-    <Text fontWeight={"bold"}>Status:</Text>
-    <Badge colorScheme={statusColor}>{statusText}</Badge>
-  </Box>
+            <Box p={3}>
+              <Text fontSize="sm">Weekly Donation: ${ethers.utils.formatEther(String(nft.metadata?.pay || "0"))} ETH</Text>
+              <Text fontSize="sm">Total Donated: ${ethers.utils.formatEther(String(nft.metadata?.sum || "0"))} ETH </Text>
+            </Box>
 
-  <Box>
-    <Text fontWeight={"bold"}>Amount Donated:</Text>
-    <Text>
-      {typeof nft.metadata?.sum === "string" || typeof nft.metadata?.sum === "number"
-        ? nft.metadata.sum
-        : "0"} wei
-    </Text>
-  </Box>
+            <Box>
+              <Text fontWeight={"bold"}>Status:</Text>
+              <Badge colorScheme={statusColor}>{statusText}</Badge>
+            </Box>
 
-  <Box>
-    <Text fontWeight={"bold"}>Rank:</Text>
-    <Badge colorScheme={
-      nft.metadata?.rank === "Gold" ? "yellow" :
-      nft.metadata?.rank === "Silver" ? "gray" :
-      nft.metadata?.rank === "Bronze" ? "orange" : "purple"
-    }>
-      {typeof nft.metadata?.rank === "string" ? nft.metadata.rank : "Unknown"}
-    </Badge>
-  </Box>
-</SimpleGrid>
+            <Box>
+              <Text fontWeight={"bold"}>Amount Donated:</Text>
+              <Text>
+                {typeof nft.metadata?.sum === "string" || typeof nft.metadata?.sum === "number"
+                  ? nft.metadata.sum
+                  : "0"} wei
+              </Text>
+            </Box>
+
+            <Box>
+              <Text fontWeight={"bold"}>Rank:</Text>
+              <Badge colorScheme={
+                nft.metadata?.rank === "Gold" ? "yellow" :
+                  nft.metadata?.rank === "Silver" ? "gray" :
+                    nft.metadata?.rank === "Bronze" ? "orange" : "purple"
+              }>
+                {typeof nft.metadata?.rank === "string" ? nft.metadata.rank : "Unknown"}
+              </Badge>
+            </Box>
+          </SimpleGrid>
           <Box paddingBottom={"50px"}>
             <SimpleGrid columns={2} spacing={4}>
               {Object.entries(nft?.metadata.attributes || {}).map(
@@ -1021,7 +1083,6 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
             </Button>
           </Box>
 
-          {/* Contract Metadata */}
           {contractMetadata && (
             <Flex alignItems={"center"}>
               <Box borderRadius={"4px"} overflow={"hidden"} mr={"10px"}>
@@ -1035,7 +1096,6 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
             </Flex>
           )}
 
-          {/* NFT Info */}
           <Box mx={2.5}>
             <Text fontSize={"4xl"} fontWeight={"bold"}>{nft.metadata.name}</Text>
             <Link href={`/profile/${nft.owner}`}>
@@ -1052,6 +1112,23 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
           >
             {isPaused ? "Activate NFT" : "Pause NFT"}
           </Web3Button>
+
+          <Box mt={4}>
+            <Button
+              colorScheme="green"
+              onClick={handleDonate}
+              isLoading={isDonating}
+              loadingText="Processing..."
+              isDisabled={nft.metadata?.status === "0"}
+            >
+              {`Donate ${ethers.utils.formatEther(String(nft.metadata?.pay || "0"))} ETH`}
+            </Button>
+            {nft.metadata?.status === "0" && (
+              <Text mt={2} color="yellow.500">
+                Donations are currently paused for this NFT
+              </Text>
+            )}
+          </Box>
         </Stack>
       </SimpleGrid>
     </Container>
@@ -1110,4 +1187,4 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export default TokenPage; // Default export at the bottom
+export default TokenPage;
