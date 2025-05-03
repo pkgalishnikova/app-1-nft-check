@@ -30,18 +30,14 @@ export default function FoodNFTGrid({
                             href={`/food_delivery/token_food/${FOOD_NFT_COLLECTION_ADDRESS}/${nft.metadata.id}`}
                             key={nft.metadata.id}
                         >
-                            <NFT nft={nft} contractAddress={""} onClick={function (): void {
-                                throw new Error("Function not implemented.");
-                            } } />
+                            <NFT nft={nft} contractAddress={""} />
                         </Link>
                     ) : (
                         <div
                             key={nft.metadata.id}
                             onClick={() => overrideOnclickBehavior(nft)}
                         >
-                            <NFT nft={nft} contractAddress={""} onClick={function (): void {
-                                    throw new Error("Function not implemented.");
-                                } } />
+                            <NFT nft={nft} contractAddress={""}  />
                         </div>
                     )
                 )
