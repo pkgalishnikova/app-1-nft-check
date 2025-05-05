@@ -262,55 +262,79 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
 
 export const getStaticProps: GetStaticProps = async (context) => {
     const tokenId = context.params?.tokenId as string;
-    const sdk = new ThirdwebSDK("sepolia");
-  
-    let nft = null;
-    let contractMetadata = null;
+    
+    // Initialize SDK with proper error handling
+    let sdk;
+    try {
+      sdk = new ThirdwebSDK("sepolia");
+    } catch (e) {
+      console.error("SDK initialization failed:", e);
+      return { notFound: true };
+    }
   
     try {
       const contract = await sdk.getContract(GYM_NFT_COLLECTION_ADDRESS);
-      nft = await contract.erc721.get(tokenId);
-      
-      // Handle undefined values
-      contractMetadata = await contract.metadata.get();
-      contractMetadata = {
-        ...contractMetadata,
-        description: contractMetadata.description ?? "No description available",
-        image: contractMetadata.image ?? null,
-        name: contractMetadata.name ?? "Unnamed Collection",
+      const [nft, metadata] = await Promise.all([
+        contract.erc721.get(tokenId),
+        contract.metadata.get().catch(() => null), // Graceful fallback
+      ]);
+  
+      if (!nft) return { notFound: true };
+  
+      return {
+        props: {
+          nft,
+          contractMetadata: {
+            description: metadata?.description || "No description available",
+            image: metadata?.image || null,
+            name: metadata?.name || "Unnamed Collection",
+          },
+        },
+        revalidate: 60, // Consider increasing revalidate time
       };
     } catch (e) {
-      console.error("Error fetching NFT or metadata:", e);
+      console.error("Error fetching NFT data:", e);
+      return { notFound: true };
     }
-  
-    return {
-      props: {
-        nft,
-        contractMetadata,
-      },
-      revalidate: 1,
-    };
   };
 
-  export const getStaticPaths: GetStaticPaths = async () => {
+//   export const getStaticPaths: GetStaticPaths = async () => {
+//     const sdk = new ThirdwebSDK("sepolia");
+  
+//     const contract = await sdk.getContract(GYM_NFT_COLLECTION_ADDRESS);
+  
+//     const nfts = await contract.erc721.getAll();
+  
+//     const paths = nfts.map((nft) => {
+//       return {
+//         params: {
+//           contractAddress: GYM_NFT_COLLECTION_ADDRESS,
+//           tokenId: nft.metadata.id,
+//         },
+//       };
+//     });
+  
+//     return {
+//       paths,
+//       fallback: "blocking", // can also be true or 'blocking'
+//     };
+//   };
+export const getStaticPaths: GetStaticPaths = async () => {
     const sdk = new ThirdwebSDK("sepolia");
-  
     const contract = await sdk.getContract(GYM_NFT_COLLECTION_ADDRESS);
-  
-    const nfts = await contract.erc721.getAll();
-  
-    const paths = nfts.map((nft) => {
-      return {
-        params: {
-          contractAddress: GYM_NFT_COLLECTION_ADDRESS,
-          tokenId: nft.metadata.id,
-        },
-      };
-    });
+    
+    // Only fetch the first 50 NFTs for static generation
+    const nfts = await contract.erc721.getAll({ count: 50 });
+    
+    const paths = nfts.map((nft) => ({
+      params: {
+        contractAddress: GYM_NFT_COLLECTION_ADDRESS,
+        tokenId: nft.metadata.id.toString(),
+      },
+    }));
   
     return {
       paths,
-      fallback: "blocking", // can also be true or 'blocking'
+      fallback: 'blocking', // Keep this for new NFTs
     };
   };
-

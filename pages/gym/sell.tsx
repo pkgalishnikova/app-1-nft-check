@@ -56,7 +56,7 @@ export default function Sell() {
                 <Heading marginBottom={"1rem"}>Sell NFTs</Heading>
                 <Alert status="warning" borderRadius="md" mb={5}>
                     <AlertIcon />
-                    You have to login or sign in to sell NFTs
+                    You have to login or sign up to sell NFTs
                 </Alert>
                 <Text>Connect your wallet to view and sell your NFTs.</Text>
 
