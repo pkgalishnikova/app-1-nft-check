@@ -417,22 +417,21 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const sdk = new ThirdwebSDK("sepolia");
-
   const contract = await sdk.getContract(CHARITY_NFT_COLLECTION_ADDRESS);
-  const nfts = await contract.erc721.getAll();
-
-  const paths = nfts.map((nft) => {
-    return {
-      params: {
-        contractAddress: CHARITY_NFT_COLLECTION_ADDRESS,
-        tokenId: nft.metadata.id,
-      },
-    };
-  });
+  
+  // Only fetch the first 50 NFTs for static generation
+  const nfts = await contract.erc721.getAll({ count: 50 });
+  
+  const paths = nfts.map((nft) => ({
+    params: {
+      contractAddress: CHARITY_NFT_COLLECTION_ADDRESS,
+      tokenId: nft.metadata.id.toString(),
+    },
+  }));
 
   return {
     paths,
-    fallback: "blocking",
+    fallback: 'blocking', // Keep this for new NFTs
   };
 };
 

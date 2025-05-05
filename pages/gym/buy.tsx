@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Center, VStack, Container, Heading, Text, Select, Flex, Box } from "@chakra-ui/react";
+import { Alert, AlertIcon, Center, VStack, Container, Heading, Text, Select, Flex, Box } from "@chakra-ui/react";
 import GymNFTGrid from "../../components_new/NFTGrids/gym_NFTGrid";
 import { GYM_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS } from "../../const/addresses";
-import { useContract, useNFTs, useValidDirectListings, useValidEnglishAuctions } from "@thirdweb-dev/react";
+import { useAddress, useContract, useNFTs, useValidDirectListings, useValidEnglishAuctions } from "@thirdweb-dev/react";
 import { NFT as NFTType } from "@thirdweb-dev/sdk";
 import { keyframes } from "@emotion/react";
 import { motion } from "framer-motion";
@@ -33,7 +33,9 @@ const itemVariants = {
 };
 
 export default function Buy() {
+    
     const { contract } = useContract(GYM_NFT_COLLECTION_ADDRESS);
+    const address = useAddress();
     const { data: nfts, isLoading } = useNFTs(contract);
     const { contract: marketplace } = useContract(MARKETPLACE_ADDRESS, "marketplace-v3");
     const [sortOption, setSortOption] = useState<string>("default");
@@ -82,6 +84,19 @@ export default function Buy() {
         }
         setSortedNFTs(sorted);
     }, [nfts, sortOption, directListings, auctionListings]);
+
+    if (!address) {
+            return (
+                <Container maxW={"1200px"} p={5}>
+                    <Alert status="warning" borderRadius="md" mb={5}>
+                        <AlertIcon />
+                        You have to login or sign up to buy NFTs
+                    </Alert>
+                    <Text>Connect your wallet to view and sell your NFTs.</Text>
+    
+                </Container>
+            );
+        }
 
     return (
         <Box

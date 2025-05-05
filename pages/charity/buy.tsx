@@ -16,7 +16,9 @@ import {
   ModalBody,
   ModalFooter,
   VStack,
-  Center
+  Center,
+  Alert,
+  AlertIcon
 } from "@chakra-ui/react";
 import {
   useContract,
@@ -172,6 +174,20 @@ const CharityBuyPage = () => {
       });
     }
   };
+
+  if (!address) {
+    return (
+      <Container maxW={"1200px"} p={5}>
+        <Alert status="warning" borderRadius="md" mb={5}>
+          <AlertIcon />
+          You have to login or sign in to donate money
+        </Alert>
+        <Text>Connect your wallet to view and sell your NFTs.</Text>
+
+      </Container>
+    );
+  }
+
   return (
     <Box
       minH="100vh"

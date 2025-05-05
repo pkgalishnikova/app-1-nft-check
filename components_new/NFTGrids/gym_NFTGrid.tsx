@@ -2,6 +2,7 @@ import type { NFT as NFTType } from "@thirdweb-dev/sdk";
 import { SimpleGrid, Skeleton, Text, Link } from "@chakra-ui/react";
 import NFT from "../NFTs/gym_NFT"
 import { GYM_NFT_COLLECTION_ADDRESS } from "../../const/addresses";
+import { useAddress } from "@thirdweb-dev/react";
 
 type Props = {
     isLoading: boolean;
@@ -17,6 +18,10 @@ export default function GymNFTGrid({
     overrideOnclickBehavior,
     emptyText = "No NFTs found",
 }: Props) {
+    const address = useAddress();
+    if (!address) {
+            return <Text>Connect your wallet to view favorites</Text>;
+        }
     return (
         <SimpleGrid columns={4} spacing={6} w={"100%"} padding={2.5} my={5}>
             {isLoading ? (

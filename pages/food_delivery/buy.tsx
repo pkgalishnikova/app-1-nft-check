@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Container, Heading, Text, Select, Flex, Box, Center, VStack } from "@chakra-ui/react";
+import { Alert, AlertIcon, Container, Heading, Text, Select, Flex, Box, Center, VStack } from "@chakra-ui/react";
 import FoodNFTGrid from "../../components_new/NFTGrids/food_NFTGrid";
 import { FOOD_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS } from "../../const/addresses";
-import { useContract, useNFTs, useValidDirectListings, useValidEnglishAuctions } from "@thirdweb-dev/react";
+import { useAddress, useContract, useNFTs, useValidDirectListings, useValidEnglishAuctions } from "@thirdweb-dev/react";
 import { NFT as NFTType } from "@thirdweb-dev/sdk";
 import { keyframes } from "@emotion/react";
 import { motion } from "framer-motion";
@@ -82,6 +82,20 @@ export default function Buy() {
         }
         setSortedNFTs(sorted);
     }, [nfts, sortOption, directListings, auctionListings]);
+
+        const address = useAddress();
+    if (!address) {
+            return (
+                <Container maxW={"1200px"} p={5}>
+                    <Alert status="warning" borderRadius="md" mb={5}>
+                        <AlertIcon />
+                        You have to login or sign up to buy NFTs
+                    </Alert>
+                    <Text>Connect your wallet to view and sell your NFTs.</Text>
+    
+                </Container>
+            );
+        }
 
     return (
         <Box
