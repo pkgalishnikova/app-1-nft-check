@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { NFT } from "@thirdweb-dev/sdk";
 import { MARKETPLACE_ADDRESS } from "../../const/addresses";
 import { ThirdwebNftMedia, useContract, useValidDirectListings, useValidEnglishAuctions, useAddress } from "@thirdweb-dev/react";
-import { Box, Flex, Skeleton, Text, HStack, Stack } from "@chakra-ui/react";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { Box, Flex, Skeleton, Text, HStack, Stack, Tooltip, Badge } from "@chakra-ui/react";
+import { FaHeart, FaRegHeart, FaStar } from "react-icons/fa";
 
 type Props = {
     nft: NFT;
@@ -13,56 +13,74 @@ type Props = {
 
 export default function FoodNFTComponent({ nft, contractAddress, onClick }: Props) {
     const address = useAddress();
-    const [isFavorite, setIsFavorite] = useState(false);
-
-    const { contract: marketplace, isLoading: loadingMarketplace } = useContract(MARKETPLACE_ADDRESS, "marketplace-v3");
-
-    const { data: directListing, isLoading: loadingDirectListing } =
-        useValidDirectListings(marketplace, {
-            tokenContract: contractAddress,
-            tokenId: nft.metadata.id,
-        });
-
-    const { data: auctionListing, isLoading: loadingAuction } =
-        useValidEnglishAuctions(marketplace, {
-            tokenContract: contractAddress,
-            tokenId: nft.metadata.id,
-        });
-
-    useEffect(() => {
-        if (address) {
+        const [isFavorite, setIsFavorite] = useState(false);
+    
+        const { contract: marketplace, isLoading: loadingMarketplace } = useContract(MARKETPLACE_ADDRESS, "marketplace-v3");
+    
+        const { data: directListing, isLoading: loadingDirectListing } =
+            useValidDirectListings(marketplace, {
+                tokenContract: contractAddress, // Use passed contract address
+                tokenId: nft.metadata.id,
+            });
+    
+        const { data: auctionListing, isLoading: loadingAuction } =
+            useValidEnglishAuctions(marketplace, {
+                tokenContract: contractAddress, // Use passed contract address
+                tokenId: nft.metadata.id,
+            });
+    
+        useEffect(() => {
+            if (address) {
+                const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
+                const compositeKey = `${contractAddress}_${nft.metadata.id}`;
+                setIsFavorite(!!favorites[compositeKey]);
+            }
+        }, [address, contractAddress, nft.metadata.id]);
+    
+        const toggleFavorite = () => {
+            if (!address) return;
+    
             const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
+            const newFavorites = { ...favorites };
             const compositeKey = `${contractAddress}_${nft.metadata.id}`;
-            setIsFavorite(!!favorites[compositeKey]);
-        }
-    }, [address, contractAddress, nft.metadata.id]);
-
-    const toggleFavorite = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!address) return;
-
-        const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
-        const newFavorites = { ...favorites };
-        const compositeKey = `${contractAddress}_${nft.metadata.id}`;
-
-        if (isFavorite) {
-            delete newFavorites[compositeKey];
-        } else {
-            newFavorites[compositeKey] = {
-                id: nft.metadata.id,
-                name: nft.metadata.name,
-                image: nft.metadata.image,
-                contractAddress: contractAddress
-            };
-        }
-
-        localStorage.setItem(`favorites_${address}`, JSON.stringify(newFavorites));
-        setIsFavorite(!isFavorite);
-    };
-
+    
+            if (isFavorite) {
+                delete newFavorites[compositeKey];
+            } else {
+                newFavorites[compositeKey] = {
+                    id: nft.metadata.id,
+                    name: nft.metadata.name,
+                    image: nft.metadata.image,
+                    contractAddress: contractAddress
+                };
+            }
+    
+            localStorage.setItem(`favorites_${address}`, JSON.stringify(newFavorites));
+            setIsFavorite(!isFavorite);
+        };
+        
        return (
            <Box width="100%" position="relative">
+            {isFavorite && (
+                            <Tooltip label="Favorited" placement="top">
+                                <Badge 
+                                    position="absolute" 
+                                    top="2" 
+                                    right="2" 
+                                    zIndex="1"
+                                    colorScheme="yellow"
+                                    borderRadius="full"
+                                    px={2}
+                                    py={1}
+                                    display="flex"
+                                    alignItems="center"
+                                    gap={1}
+                                >
+                                    <FaStar size="12px" />
+                                    <Text fontSize="xs">Favorited</Text>
+                                </Badge>
+                            </Tooltip>
+                        )}
              <Flex 
                direction="column" 
                p={0}

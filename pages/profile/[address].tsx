@@ -305,6 +305,19 @@ const ProfilePage: React.FC = () => {
     charityCollection,
     router.query.address as string
   );
+  const [favorites, setFavorites] = useState<Record<string, any>>({});
+  
+  useEffect(() => {
+    const handleStorageChange = () => {
+        if (address) {
+          const favs = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
+          setFavorites(favs);
+        }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+}, [address]);
 
   return (
     <Box
@@ -362,7 +375,7 @@ const ProfilePage: React.FC = () => {
           mx="auto"
           mb={12}
         >
-          {/* <FavoriteNFTGrid /> */}
+          <FavoriteNFTGrid />
         </Box>
 
         <VStack spacing={4} textAlign="center" mb={8}>

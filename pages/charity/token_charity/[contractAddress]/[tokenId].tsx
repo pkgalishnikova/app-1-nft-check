@@ -9,17 +9,21 @@ import {
   Stack,
   Text,
   useToast,
-  Badge
+  Badge,
+  Tooltip,
+  IconButton
 } from "@chakra-ui/react";
 import {
   MediaRenderer,
   ThirdwebNftMedia,
   Web3Button,
   useContract,
+  useAddress,
   useValidDirectListings,
   useValidEnglishAuctions,
   useContractWrite
 } from "@thirdweb-dev/react";
+import { FaStar, FaRegStar } from "react-icons/fa";
 import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import React, { useState } from "react";
 import { CHARITY_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS, APP_CHARITY_CONTRACT_ADDRESS } from "../../../../const/addresses";
@@ -43,6 +47,7 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
   const [isDonating, setIsDonating] = useState(false);
   const { mutateAsync: makeDonation } = useContractWrite(appNFTCharity, "transferFunds");
   const router = useRouter();
+  const address = useAddress();
   const payAmount = ethers.utils.parseEther("0.1");
 
   const { data: directListing, isLoading: loadingDirectListing } =
@@ -100,23 +105,19 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
       }
   
       // Execute the donation
-      const tx = await appNFTCharity.call(
-        "transferFunds",
-        [
-          tokenId,
-          charityId,
-          currentStatus,
-          currentDonations,
-          donationAmount
-        ],
-        {
-          value: donationAmount,
-          gasLimit: 300000 // Added gas limit to prevent out-of-gas errors
-        }
-      );
+      const tx = await appNFTCharity?.call("transferFunds", [
+        tokenId,
+        charityId,
+        currentStatus,
+        currentDonations,
+        donationAmount
+      ], {
+        value: donationAmount,
+        gasLimit: 300000
+      });
   
       // Wait for transaction confirmation
-      const receipt = await tx.wait();
+      const receipt = await tx?.wait();
       
       toast({
         title: "Donation Successful!",
@@ -204,6 +205,40 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
       });
     }
   }
+const [isFavorite, setIsFavorite] = React.useState(false);
+
+  React.useEffect(() => {
+              if (address) {
+                  const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
+                  const compositeKey = `${CHARITY_NFT_COLLECTION_ADDRESS}_${nft.metadata.id}`;
+                  setIsFavorite(!!favorites[compositeKey]);
+              }
+          }, [address, nft.metadata.id]);
+      
+          // In your TokenPage component, update the toggleFavorite function:
+          const toggleFavorite = () => {
+              if (!address) return;
+          
+              const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
+              const newFavorites = { ...favorites };
+              const compositeKey = `${CHARITY_NFT_COLLECTION_ADDRESS}_${nft.metadata.id}`;
+      
+              if (isFavorite) {
+                  delete newFavorites[compositeKey];
+              } else {
+                  newFavorites[compositeKey] = {
+                      id: nft.metadata.id,
+                      name: nft.metadata.name,
+                      image: nft.metadata.image,
+                      contractAddress: CHARITY_NFT_COLLECTION_ADDRESS
+                  };
+              }
+      
+              localStorage.setItem(`favorites_${address}`, JSON.stringify(newFavorites));
+              window.dispatchEvent(new Event('storage'));
+              setIsFavorite(!isFavorite);
+      
+          };
 
   return (
     <Container maxW={"1200px"} p={5} my={5}>
@@ -286,6 +321,15 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
             <Button onClick={() => router.back()} colorScheme="gray" size="sm">
               ← Back
             </Button>
+            <Tooltip label={isFavorite ? "Remove from favorites" : "Add to favorites"}>
+                    <IconButton marginLeft={2}
+                        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                        icon={isFavorite ? <FaStar color="gold" /> : <FaRegStar />}
+                        onClick={toggleFavorite}
+                        size="sm"
+                        variant="outline"
+                    />
+                </Tooltip>
           </Box>
 
           {contractMetadata && (

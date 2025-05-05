@@ -115,7 +115,7 @@ import React, { useState, useEffect } from "react";
 import { NFT } from "@thirdweb-dev/sdk";
 import { MARKETPLACE_ADDRESS } from "../../const/addresses";
 import { ThirdwebNftMedia, useContract, useValidDirectListings, useValidEnglishAuctions, useAddress } from "@thirdweb-dev/react";
-import { Box, Flex, Skeleton, Text, HStack, Stack } from "@chakra-ui/react";
+import { Box, Badge, Flex, Skeleton, Text, HStack, Stack, Tooltip, IconButton } from "@chakra-ui/react";
 import { FaStar, FaRegStar } from "react-icons/fa";
 
 type Props = {
@@ -132,13 +132,13 @@ export default function GymNFTComponent({ nft, contractAddress, onClick }: Props
 
     const { data: directListing, isLoading: loadingDirectListing } =
         useValidDirectListings(marketplace, {
-            tokenContract: contractAddress, // Use passed contract address
+            tokenContract: contractAddress, 
             tokenId: nft.metadata.id,
         });
 
     const { data: auctionListing, isLoading: loadingAuction } =
         useValidEnglishAuctions(marketplace, {
-            tokenContract: contractAddress, // Use passed contract address
+            tokenContract: contractAddress,
             tokenId: nft.metadata.id,
         });
 
@@ -173,6 +173,26 @@ export default function GymNFTComponent({ nft, contractAddress, onClick }: Props
     };
     return (
         <Box width="100%" position="relative">
+            {isFavorite && (
+                <Tooltip label="Favorited" placement="top">
+                    <Badge 
+                        position="absolute" 
+                        top="2" 
+                        right="2" 
+                        zIndex="1"
+                        colorScheme="yellow"
+                        borderRadius="full"
+                        px={2}
+                        py={1}
+                        display="flex"
+                        alignItems="center"
+                        gap={1}
+                    >
+                        <FaStar size="12px" />
+                        <Text fontSize="xs">Favorited</Text>
+                    </Badge>
+                </Tooltip>
+            )}
             <Flex
                 direction="column"
                 p={0}
