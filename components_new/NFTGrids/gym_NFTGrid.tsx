@@ -20,8 +20,8 @@ export default function GymNFTGrid({
 }: Props) {
     const address = useAddress();
     if (!address) {
-            return <Text>Connect your wallet to view favorites</Text>;
-        }
+        return <Text>Connect your wallet to view collection.</Text>;
+    }
     return (
         <SimpleGrid columns={4} spacing={6} w={"100%"} padding={2.5} my={5}>
             {isLoading ? (
@@ -36,7 +36,7 @@ export default function GymNFTGrid({
                             key={nft.metadata.id}
                         >
                             <NFT nft={nft} contractAddress={""}
-                         />
+                            />
                         </Link>
                     ) : (
                         <div
