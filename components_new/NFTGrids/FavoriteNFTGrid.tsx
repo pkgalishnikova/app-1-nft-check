@@ -45,7 +45,7 @@ export default function FavoriteNFTGrid() {
     );
 
     if (!address) {
-        return <Text>Connect your wallet to view favorites</Text>;
+        return <Text>Connect your wallet to view favorites.</Text>;
     }
 
     if (isLoading) {

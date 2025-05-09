@@ -24,7 +24,7 @@ import {
   useContractWrite
 } from "@thirdweb-dev/react";
 import { FaStar, FaRegStar } from "react-icons/fa";
-import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { SmartContract, NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import React, { useState } from "react";
 import { CHARITY_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS, APP_CHARITY_CONTRACT_ADDRESS } from "../../../../const/addresses";
 import { GetStaticPaths, GetStaticProps } from "next";
@@ -82,28 +82,28 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
       });
       return;
     }
-  
+
     setIsDonating(true);
     try {
       // Convert all values to the exact format expected by the contract
-      const payAmount = typeof nft.metadata.pay === 'number' 
-      ? nft.metadata.pay.toString() 
-      : String(nft.metadata.pay);
-    
-    // Now safely parse
-    const donationAmount = ethers.BigNumber.from(nft.metadata.pay);
-    
-    // Rest of your donation logic...
-    const tokenId = ethers.BigNumber.from(nft.metadata.id);
-    const charityId = 1;
-    const currentStatus = ethers.BigNumber.from(nft.metadata.status || "0");
-    const currentDonations = ethers.BigNumber.from(nft.metadata.sum || "0");
+      const payAmount = typeof nft.metadata.pay === 'number'
+        ? nft.metadata.pay.toString()
+        : String(nft.metadata.pay);
+
+      // Now safely parse
+      const donationAmount = ethers.BigNumber.from(nft.metadata.pay);
+
+      // Rest of your donation logic...
+      const tokenId = ethers.BigNumber.from(nft.metadata.id);
+      const charityId = 1;
+      const currentStatus = ethers.BigNumber.from(nft.metadata.status || "0");
+      const currentDonations = ethers.BigNumber.from(nft.metadata.sum || "0");
 
       // Verify contract is properly initialized
       if (!appNFTCharity) {
         throw new Error("Charity contract not connected");
       }
-  
+
       // Execute the donation
       const tx = await appNFTCharity?.call("transferFunds", [
         tokenId,
@@ -115,10 +115,10 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
         value: donationAmount,
         gasLimit: 300000
       });
-  
+
       // Wait for transaction confirmation
       const receipt = await tx?.wait();
-      
+
       toast({
         title: "Donation Successful!",
         description: `Thank you for donating ${ethers.utils.formatEther(donationAmount)} ETH`,
@@ -126,13 +126,13 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
         duration: 5000,
         isClosable: true,
       });
-  
+
       // Refresh the NFT data
       router.replace(router.asPath);
-  
+
     } catch (error: any) {
       console.error("Donation failed:", error);
-      
+
       // Improved error parsing
       let errorMessage = "Transaction failed";
       if (error.reason) {
@@ -142,7 +142,7 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-  
+
       toast({
         title: "Donation Failed",
         description: errorMessage,
@@ -205,40 +205,40 @@ const TokenPage = ({ nft, contractMetadata }: Props) => {
       });
     }
   }
-const [isFavorite, setIsFavorite] = React.useState(false);
+  const [isFavorite, setIsFavorite] = React.useState(false);
 
   React.useEffect(() => {
-              if (address) {
-                  const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
-                  const compositeKey = `${CHARITY_NFT_COLLECTION_ADDRESS}_${nft.metadata.id}`;
-                  setIsFavorite(!!favorites[compositeKey]);
-              }
-          }, [address, nft.metadata.id]);
-      
-          // In your TokenPage component, update the toggleFavorite function:
-          const toggleFavorite = () => {
-              if (!address) return;
-          
-              const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
-              const newFavorites = { ...favorites };
-              const compositeKey = `${CHARITY_NFT_COLLECTION_ADDRESS}_${nft.metadata.id}`;
-      
-              if (isFavorite) {
-                  delete newFavorites[compositeKey];
-              } else {
-                  newFavorites[compositeKey] = {
-                      id: nft.metadata.id,
-                      name: nft.metadata.name,
-                      image: nft.metadata.image,
-                      contractAddress: CHARITY_NFT_COLLECTION_ADDRESS
-                  };
-              }
-      
-              localStorage.setItem(`favorites_${address}`, JSON.stringify(newFavorites));
-              window.dispatchEvent(new Event('storage'));
-              setIsFavorite(!isFavorite);
-      
-          };
+    if (address) {
+      const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
+      const compositeKey = `${CHARITY_NFT_COLLECTION_ADDRESS}_${nft.metadata.id}`;
+      setIsFavorite(!!favorites[compositeKey]);
+    }
+  }, [address, nft.metadata.id]);
+
+  // In your TokenPage component, update the toggleFavorite function:
+  const toggleFavorite = () => {
+    if (!address) return;
+
+    const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
+    const newFavorites = { ...favorites };
+    const compositeKey = `${CHARITY_NFT_COLLECTION_ADDRESS}_${nft.metadata.id}`;
+
+    if (isFavorite) {
+      delete newFavorites[compositeKey];
+    } else {
+      newFavorites[compositeKey] = {
+        id: nft.metadata.id,
+        name: nft.metadata.name,
+        image: nft.metadata.image,
+        contractAddress: CHARITY_NFT_COLLECTION_ADDRESS
+      };
+    }
+
+    localStorage.setItem(`favorites_${address}`, JSON.stringify(newFavorites));
+    window.dispatchEvent(new Event('storage'));
+    setIsFavorite(!isFavorite);
+
+  };
 
   return (
     <Container maxW={"1200px"} p={5} my={5}>
@@ -322,14 +322,14 @@ const [isFavorite, setIsFavorite] = React.useState(false);
               ← Back
             </Button>
             <Tooltip label={isFavorite ? "Remove from favorites" : "Add to favorites"}>
-                    <IconButton marginLeft={2}
-                        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                        icon={isFavorite ? <FaStar color="gold" /> : <FaRegStar />}
-                        onClick={toggleFavorite}
-                        size="sm"
-                        variant="outline"
-                    />
-                </Tooltip>
+              <IconButton marginLeft={2}
+                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                icon={isFavorite ? <FaStar color="gold" /> : <FaRegStar />}
+                onClick={toggleFavorite}
+                size="sm"
+                variant="outline"
+              />
+            </Tooltip>
           </Box>
 
           {contractMetadata && (
@@ -384,54 +384,91 @@ const [isFavorite, setIsFavorite] = React.useState(false);
   );
 }
 
+// export const getStaticProps: GetStaticProps = async (context) => {
+//   const tokenId = context.params?.tokenId as string;
+//   const sdk = new ThirdwebSDK("sepolia");
+
+//   let nft = null;
+//   let contractMetadata = null;
+
+//   try {
+//     const contract = await sdk.getContract(CHARITY_NFT_COLLECTION_ADDRESS);
+//     nft = await contract.erc721.get(tokenId);
+
+//     contractMetadata = await contract.metadata.get();
+//     contractMetadata = {
+//       ...contractMetadata,
+//       description: contractMetadata.description ?? "No description available",
+//       image: contractMetadata.image ?? null,
+//       name: contractMetadata.name ?? "Unnamed Collection",
+//     };
+//   } catch (e) {
+//     console.error("Error fetching NFT or metadata:", e);
+//   }
+
+//   return {
+//     props: {
+//       nft,
+//       contractMetadata,
+//     },
+//     revalidate: 1,
+//   };
+// };
+
+
 export const getStaticProps: GetStaticProps = async (context) => {
   const tokenId = context.params?.tokenId as string;
   const sdk = new ThirdwebSDK("sepolia");
 
-  let nft = null;
-  let contractMetadata = null;
-
   try {
-    const contract = await sdk.getContract(CHARITY_NFT_COLLECTION_ADDRESS);
-    nft = await contract.erc721.get(tokenId);
+    // Type the contract as SmartContract
+    const contract: SmartContract = await sdk.getContract(CHARITY_NFT_COLLECTION_ADDRESS);
 
-    contractMetadata = await contract.metadata.get();
-    contractMetadata = {
-      ...contractMetadata,
-      description: contractMetadata.description ?? "No description available",
-      image: contractMetadata.image ?? null,
-      name: contractMetadata.name ?? "Unnamed Collection",
+    // Type the NFT data
+    const nft: NFT = await contract.erc721.get(tokenId);
+
+    // Type the metadata
+    const contractMetadata = await contract.metadata.get() as {
+      description?: string;
+      image?: string;
+      name?: string;
+    };
+
+    return {
+      props: {
+        nft,
+        contractMetadata: {
+          description: contractMetadata.description ?? "No description available",
+          image: contractMetadata.image ?? null,
+          name: contractMetadata.name ?? "Unnamed Collection",
+        },
+      },
+      revalidate: 1,
     };
   } catch (e) {
     console.error("Error fetching NFT or metadata:", e);
+    return {
+      notFound: true,
+    };
   }
-
-  return {
-    props: {
-      nft,
-      contractMetadata,
-    },
-    revalidate: 1,
-  };
 };
-
 export const getStaticPaths: GetStaticPaths = async () => {
   const sdk = new ThirdwebSDK("sepolia");
-  const contract = await sdk.getContract(CHARITY_NFT_COLLECTION_ADDRESS);
-  
-  // Only fetch the first 50 NFTs for static generation
-  const nfts = await contract.erc721.getAll({ count: 50 });
-  
+  const contract: SmartContract = await sdk.getContract(CHARITY_NFT_COLLECTION_ADDRESS);
+
+  // Type the NFTs array
+  const nfts: NFT[] = await contract.erc721.getAll();
+
   const paths = nfts.map((nft) => ({
     params: {
       contractAddress: CHARITY_NFT_COLLECTION_ADDRESS,
-      tokenId: nft.metadata.id.toString(),
+      tokenId: nft.metadata.id,
     },
   }));
 
   return {
     paths,
-    fallback: 'blocking', // Keep this for new NFTs
+    fallback: "blocking",
   };
 };
 
