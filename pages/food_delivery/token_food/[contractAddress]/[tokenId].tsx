@@ -2,7 +2,7 @@ import { Avatar, Box, Container, Flex, Input, SimpleGrid, Skeleton, Stack, Text,
 import { MediaRenderer, ThirdwebNftMedia, Web3Button, useAddress, useContract, useMinimumNextBid, useValidDirectListings, useValidEnglishAuctions } from "@thirdweb-dev/react";
 import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import React, { useState } from "react";
-import { FOOD_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS } from "../../../../const/addresses";
+import { FOOD_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS } from "@/const/addresses";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from 'next/router';

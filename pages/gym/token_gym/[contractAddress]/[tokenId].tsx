@@ -2,7 +2,7 @@ import { Avatar, Box, Container, Flex, Input, SimpleGrid, Skeleton, Stack, Text,
 import { MediaRenderer, ThirdwebNftMedia, Web3Button, useContract, useMinimumNextBid, useValidDirectListings, useValidEnglishAuctions } from "@thirdweb-dev/react";
 import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import React, { useState } from "react";
-import { GYM_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS } from "../../../../const/addresses";
+import { GYM_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS } from "@/const/addresses";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from 'next/router';
@@ -26,7 +26,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
     const router = useRouter();
     const address = useAddress();
     const [isFavorite, setIsFavorite] = React.useState(false);
-    
+
     React.useEffect(() => {
         if (address) {
             const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
@@ -38,7 +38,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
     // In your TokenPage component, update the toggleFavorite function:
     const toggleFavorite = () => {
         if (!address) return;
-    
+
         const favorites = JSON.parse(localStorage.getItem(`favorites_${address}`) || '{}');
         const newFavorites = { ...favorites };
         const compositeKey = `${GYM_NFT_COLLECTION_ADDRESS}_${nft.metadata.id}`;
@@ -59,8 +59,8 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
         setIsFavorite(!isFavorite);
 
     };
-        const { data: directListing, isLoading: loadingDirectListing } =
-            useValidDirectListings(marketplace, {
+    const { data: directListing, isLoading: loadingDirectListing } =
+        useValidDirectListings(marketplace, {
             tokenContract: GYM_NFT_COLLECTION_ADDRESS,
             tokenId: nft.metadata.id,
         });
@@ -95,7 +95,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
 
     async function createBidOffer() {
         let txResult;
-        if(!bidValue) {
+        if (!bidValue) {
             return;
         }
 
@@ -104,7 +104,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                 auctionListing[0].id,
                 bidValue
             );
-        } else if (directListing?.[0]){
+        } else if (directListing?.[0]) {
             txResult = await marketplace?.offers.makeOffer({
                 assetContractAddress: GYM_NFT_COLLECTION_ADDRESS,
                 tokenId: nft.metadata.id,
@@ -115,7 +115,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
         }
         return txResult;
     }
-    
+
     return (
         <Container maxW={"1200px"} p={5} my={5}>
             <SimpleGrid columns={2} spacing={6}>
@@ -158,23 +158,23 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                         </SimpleGrid>
                     </Box>
                 </Stack>
-                
+
                 <Stack spacing={"20px"}>
-                <Box display="flex" alignItems="center" gap={2} mb={4}>
-    <Button onClick={() => router.back()} colorScheme="gray" size="sm">
-        ← Back
-    </Button>
-    <Tooltip label={isFavorite ? "Remove from favorites" : "Add to favorites"}>
-        <IconButton
-            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-            icon={isFavorite ? <FaStar color="gold" /> : <FaRegStar />}
-            onClick={toggleFavorite}
-            size="sm"
-            variant="outline"
-        />
-    </Tooltip>
-</Box>
-                              
+                    <Box display="flex" alignItems="center" gap={2} mb={4}>
+                        <Button onClick={() => router.back()} colorScheme="gray" size="sm">
+                            ← Back
+                        </Button>
+                        <Tooltip label={isFavorite ? "Remove from favorites" : "Add to favorites"}>
+                            <IconButton
+                                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                icon={isFavorite ? <FaStar color="gold" /> : <FaRegStar />}
+                                onClick={toggleFavorite}
+                                size="sm"
+                                variant="outline"
+                            />
+                        </Tooltip>
+                    </Box>
+
                     {contractMetadata && (
                         <Flex alignItems={"center"}>
                             <Box borderRadius={"4px"} overflow={"hidden"} mr={"10px"}>
@@ -202,7 +202,7 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
                     <Stack backgroundColor={"#EEE"} p={2.5} borderRadius={"6px"}>
                         <Text color={"darkgray"}>Price:</Text>
                         <Skeleton isLoaded={!loadingMarketplace && !loadingDirectListing}>
-                            { directListing && directListing[0] ? (
+                            {directListing && directListing[0] ? (
                                 <Text fontSize={"3xl"} fontWeight={"bold"}>
                                     {directListing[0]?.currencyValuePerToken.displayValue}
                                     {" " + directListing[0]?.currencyValuePerToken.symbol}
@@ -262,49 +262,49 @@ export default function TokenPage({ nft, contractMetadata }: Props) {
 
 export const getStaticProps: GetStaticProps = async (context) => {
     const tokenId = context.params?.tokenId as string;
-    
+
     // Initialize SDK with proper error handling
     let sdk;
     try {
-      sdk = new ThirdwebSDK("sepolia");
+        sdk = new ThirdwebSDK("sepolia");
     } catch (e) {
-      console.error("SDK initialization failed:", e);
-      return { notFound: true };
+        console.error("SDK initialization failed:", e);
+        return { notFound: true };
     }
-  
+
     try {
-      const contract = await sdk.getContract(GYM_NFT_COLLECTION_ADDRESS);
-      const [nft, metadata] = await Promise.all([
-        contract.erc721.get(tokenId),
-        contract.metadata.get().catch(() => null), // Graceful fallback
-      ]);
-  
-      if (!nft) return { notFound: true };
-  
-      return {
-        props: {
-          nft,
-          contractMetadata: {
-            description: metadata?.description || "No description available",
-            image: metadata?.image || null,
-            name: metadata?.name || "Unnamed Collection",
-          },
-        },
-        revalidate: 60, // Consider increasing revalidate time
-      };
+        const contract = await sdk.getContract(GYM_NFT_COLLECTION_ADDRESS);
+        const [nft, metadata] = await Promise.all([
+            contract.erc721.get(tokenId),
+            contract.metadata.get().catch(() => null), // Graceful fallback
+        ]);
+
+        if (!nft) return { notFound: true };
+
+        return {
+            props: {
+                nft,
+                contractMetadata: {
+                    description: metadata?.description || "No description available",
+                    image: metadata?.image || null,
+                    name: metadata?.name || "Unnamed Collection",
+                },
+            },
+            revalidate: 60, // Consider increasing revalidate time
+        };
     } catch (e) {
-      console.error("Error fetching NFT data:", e);
-      return { notFound: true };
+        console.error("Error fetching NFT data:", e);
+        return { notFound: true };
     }
-  };
+};
 
 //   export const getStaticPaths: GetStaticPaths = async () => {
 //     const sdk = new ThirdwebSDK("sepolia");
-  
+
 //     const contract = await sdk.getContract(GYM_NFT_COLLECTION_ADDRESS);
-  
+
 //     const nfts = await contract.erc721.getAll();
-  
+
 //     const paths = nfts.map((nft) => {
 //       return {
 //         params: {
@@ -313,7 +313,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 //         },
 //       };
 //     });
-  
+
 //     return {
 //       paths,
 //       fallback: "blocking", // can also be true or 'blocking'
@@ -322,19 +322,19 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export const getStaticPaths: GetStaticPaths = async () => {
     const sdk = new ThirdwebSDK("sepolia");
     const contract = await sdk.getContract(GYM_NFT_COLLECTION_ADDRESS);
-    
+
     // Only fetch the first 50 NFTs for static generation
     const nfts = await contract.erc721.getAll({ count: 50 });
-    
+
     const paths = nfts.map((nft) => ({
-      params: {
-        contractAddress: GYM_NFT_COLLECTION_ADDRESS,
-        tokenId: nft.metadata.id.toString(),
-      },
+        params: {
+            contractAddress: GYM_NFT_COLLECTION_ADDRESS,
+            tokenId: nft.metadata.id.toString(),
+        },
     }));
-  
+
     return {
-      paths,
-      fallback: 'blocking', // Keep this for new NFTs
+        paths,
+        fallback: 'blocking', // Keep this for new NFTs
     };
-  };
+};
