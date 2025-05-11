@@ -26,7 +26,7 @@ import {
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { SmartContract, NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import React, { useState } from "react";
-import { CHARITY_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS, APP_CHARITY_CONTRACT_ADDRESS } from "../../../../const/addresses";
+// import { CHARITY_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS, APP_CHARITY_CONTRACT_ADDRESS } from "../../../../const/addresses";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from 'next/router';
@@ -37,6 +37,12 @@ type Props = {
   nft: NFT;
   contractMetadata: any;
 };
+
+export const MARKETPLACE_ADDRESS = "0x1e90e9a7d04832E5E6e3002f6E459f9137E4e438";
+
+export const CHARITY_NFT_COLLECTION_ADDRESS = "0x7b26e3548499a14E462448155942EC845aD4354a"
+
+export const APP_CHARITY_CONTRACT_ADDRESS = "0xB23b3F8029a808b56a7b25EF16E50D37A35Da6DB" 
 
 const TokenPage = ({ nft, contractMetadata }: Props) => {
   const { contract: marketplace, isLoading: loadingMarketplace } =
