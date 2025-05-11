@@ -2,7 +2,6 @@ import { Avatar, Box, Container, Flex, Input, SimpleGrid, Skeleton, Stack, Text,
 import { MediaRenderer, ThirdwebNftMedia, Web3Button, useContract, useMinimumNextBid, useValidDirectListings, useValidEnglishAuctions } from "@thirdweb-dev/react";
 import { NFT, ThirdwebSDK } from "@thirdweb-dev/sdk";
 import React, { useState } from "react";
-import { GYM_NFT_COLLECTION_ADDRESS, MARKETPLACE_ADDRESS } from "@/const/addresses";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from 'next/router';
@@ -14,6 +13,10 @@ type Props = {
     nft: NFT;
     contractMetadata: any;
 };
+
+export const MARKETPLACE_ADDRESS = "0x1e90e9a7d04832E5E6e3002f6E459f9137E4e438";
+
+export const GYM_NFT_COLLECTION_ADDRESS = "0x699EDCdEA43BB51c69c8adEC48CBc1D6858eA9C0";
 
 export default function TokenPage({ nft, contractMetadata }: Props) {
     const { contract: marketplace, isLoading: loadingMarketplace } =
